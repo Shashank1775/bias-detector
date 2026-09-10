@@ -1,103 +1,86 @@
-import Image from "next/image";
+'use client'
+
+import InfoSection from "@/blocks/InfoSection";
+import AboutBias from "@/blocks/aboutBias";
+import AboutHate from "@/blocks/aboutHate";
+import AboutMis from "@/blocks/aboutMisinformation";
+import TextBoxDetector from "@/blocks/detectors/textBoxDetector";
+import HomeNav from "@/blocks/homeNav";
+import { useState, useEffect } from "react";
+
+// Words cycled by the typewriter effect in the hero heading.
+const WORDS = ["Community", "Platform", "Solution", "World", "Universe"];
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [wordIndex, setWordIndex] = useState(0);
+  const [displayedWord, setDisplayedWord] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [charIndex, setCharIndex] = useState(0);
+  
+  useEffect(() => {
+    const word = WORDS[wordIndex];
+    const typingSpeed = deleting ? 100 : 150;
+    let delay = 0;
+  
+    if (!deleting && charIndex === word.length) {
+      delay = 1000; // 1 second pause before deleting
+    } else if (deleting && charIndex === 0) {
+      delay = 500; // 500ms pause before switching words
+    }
+  
+    const timeout = setTimeout(() => {
+      if (!deleting && charIndex < word.length) {
+        setDisplayedWord(word.substring(0, charIndex + 1));
+        setCharIndex(charIndex + 1);
+      } else if (deleting && charIndex > 0) {
+        setDisplayedWord(word.substring(0, charIndex - 1));
+        setCharIndex(charIndex - 1);
+      } else {
+        // Only switch the word after the deletion is finished
+        setDeleting(!deleting);
+        if (deleting && charIndex === 0) {
+          setWordIndex((prev) => (prev + 1) % WORDS.length);
+        }
+      }
+    }, typingSpeed + delay);
+  
+    return () => clearTimeout(timeout);
+  }, [charIndex, deleting, wordIndex]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  return (
+    <>
+      <HomeNav />
+      <div className="bg-gray-900 w-[screen] flex flex-col items-center justify-center">
+          <div className="items-center w-[130vh] flex justify-center h-[40vh] text-spacing-8 flex-col tracking-wider mt-70">
+            <h1 className="text-7xl font-black text-center text-white leading[120%]">All-in-One Platform to Create an Unbiased</h1>
+            <div className="min-h-[9vh] mt-6">
+              <h1 className="text-7xl font-black text-center tracking-tight text-blue-400">{displayedWord}</h1>
+            </div>
+            <div className="w-[70vh] text-center mt-6">
+              <p className="text-white">
+                The AI-Powered Bias &amp; Misinformation Detection Platform uses Claude to detect bias, misinformation, hate speech, and stereotypes in text and explain exactly which passages triggered each finding.
+              </p>
+            </div>
+            <div className="mt-12">
+              <button className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-8 py-3 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105">
+                <span className="text-lg font-semibold">Get Started</span>
+              </button>
+            </div>
+          </div>
+          <div className="mt-30 bg-gray-900">
+            <TextBoxDetector />
+          </div>
+          <div className="mt-30">
+            <InfoSection />
+          </div>
+          <div className="w-full bg-gray-800 h-[120vh] mt-24">
+            <div>
+              <AboutBias />
+              <AboutMis />
+              <AboutHate />
+            </div>
+          </div>
+      </div>
+    </>
   );
 }
